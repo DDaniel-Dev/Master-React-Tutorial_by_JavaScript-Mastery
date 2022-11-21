@@ -1,40 +1,58 @@
 import { useState, useEffect } from 'react';
+import MovieCard from './MovieCard';
+import SearchIcon from './search.svg';
 import './App.css';
 
+const API_URL = "https://www.omdbapi.com/?apikey=63fa1bfd"
 
 const App = () => {
-  const name = "Daniel D";
-  const isNameShowing = true;
-
-  const [counter, setCounter] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    setCounter(10)
-  }, [])
+    searchMovies("Superman")
+  }, []);
+
+
+  const searchMovies = async (title) => {
+    const res = await fetch(`${API_URL}&s=${title}`);
+    const data = await res.json();
+    console.log(data.Search)
+    setMovies(data.Search);
+  }
 
   return (
-    <div className="App container bg-dark">
-      <h1 className='text-light'>
-        HELLO REACT and Developer {isNameShowing ? name : "Anonymous!"}!
-      </h1>
-      <button 
-        onClick={() => setCounter((nextCount) => nextCount + 1)}
-      >+
-      </button>
-      <h2 className='text-light'>{counter}</h2>
-      <button
-        onClick={() => setCounter((prevCount) => prevCount - 1)}
-      >-</button>
-      <hr className='text-light'></hr>
-      <h1 className='text-light'>A test text from a recent news...</h1>
-      <br></br>
-      <h3 className='text-light'>
-        FTX has filed for bankruptcy protection in the US after the struggling cryptocurrency exchange failed in a last-ditch effort to secure a rescue package. 
-      Earlier this year, leading voices from the cryptocurrency industry, including FTX's Sam Bankman-Fried and Binance CEO 'CZ', told the story of how the cryptocurrency industry ballooned into a market worth more than $2tn with little regulatory oversight. 
-      How did regulators lose control and can they get a grip now?
-      </h3>
+    <div className="app container bg-dark text-light">
+      <h1>MovieLand</h1>
+
+      <div className="search">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search for movies"
+        />
+        <img
+          src={SearchIcon}
+          alt="search"
+          onClick={() => searchMovies(searchTerm)}
+        />
+      </div>
+      {
+        movies?.length > 0 
+          ? (
+            <div className='container'>
+              {movies.map((movie) => (
+                <MovieCard movie={movie} />
+              ))}
+            </div>
+          ) : (
+            <div className='empty'>
+              <h2>No movies found</h2>
+            </div>
+          )
+      }
     </div>
   );
-}
+};
 
 export default App;
